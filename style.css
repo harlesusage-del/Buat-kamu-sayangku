@@ -1,0 +1,1220 @@
+/* =========================================
+   MATRIX BIRTHDAY — STYLE.CSS
+   Red Matrix Cyberpunk Experience
+   ========================================= */
+
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  --red: #ff003c;
+  --red-dim: #990020;
+  --red-glow: rgba(255, 0, 60, 0.6);
+  --red-faint: rgba(255, 0, 60, 0.15);
+  --black: #000000;
+  --white: #ffffff;
+  --font: 'JetBrains Mono', 'Courier New', monospace;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #000;
+  cursor: none;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* ─── CANVAS ─── */
+#matrix-canvas {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  opacity: 0.85;
+}
+
+/* ─── GLITCH OVERLAY ─── */
+#glitch-overlay {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+  pointer-events: none;
+  opacity: 0;
+  background: transparent;
+}
+
+#glitch-overlay.glitch-rgb {
+  animation: rgbSplit 0.15s steps(1) forwards;
+}
+
+#glitch-overlay.glitch-flash {
+  animation: screenFlash 0.1s ease forwards;
+}
+
+#glitch-overlay.glitch-scan {
+  animation: scanDistort 0.2s steps(2) forwards;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(255, 0, 60, 0.08) 2px,
+    rgba(255, 0, 60, 0.08) 4px
+  );
+  opacity: 1;
+}
+
+@keyframes rgbSplit {
+  0%   { opacity: 0; }
+  20%  { 
+    opacity: 1;
+    box-shadow: -4px 0 0 rgba(255,0,60,0.5), 4px 0 0 rgba(0,255,200,0.3);
+    transform: translateX(-3px);
+    filter: hue-rotate(30deg);
+  }
+  60%  { 
+    opacity: 0.7;
+    transform: translateX(3px);
+    filter: hue-rotate(-30deg);
+  }
+  100% { opacity: 0; transform: translateX(0); }
+}
+
+@keyframes screenFlash {
+  0%   { opacity: 0; background: transparent; }
+  30%  { opacity: 1; background: rgba(255,0,60,0.12); }
+  100% { opacity: 0; background: transparent; }
+}
+
+@keyframes scanDistort {
+  0%   { opacity: 0; }
+  50%  { opacity: 1; transform: translateY(-2px); }
+  100% { opacity: 0; transform: translateY(0); }
+}
+
+/* ─── SCANLINES ─── */
+#scanlines {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 3;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 3px,
+    rgba(0,0,0,0.18) 3px,
+    rgba(0,0,0,0.18) 4px
+  );
+  animation: scanlineMove 8s linear infinite;
+}
+
+@keyframes scanlineMove {
+  0%   { background-position: 0 0; }
+  100% { background-position: 0 100px; }
+}
+
+/* ─── MEDIA CONTAINER ─── */
+#media-container {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+#media-container.visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Outer glow ring — pure neon effect around the frame */
+#media-frame {
+  position: relative;
+  width: min(68vw, 300px);
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+
+  /* Rounded corners */
+  border-radius: 18px;
+
+  /* Neon border layering: thin bright line + multiple glow halos */
+  border: 1.5px solid rgba(255, 0, 60, 0.9);
+  box-shadow:
+    /* inner soft bleed */
+    inset 0 0 18px rgba(255, 0, 60, 0.12),
+    /* close outer glow */
+    0 0 8px  rgba(255, 0, 60, 0.85),
+    /* mid glow */
+    0 0 20px rgba(255, 0, 60, 0.55),
+    /* wide soft halo */
+    0 0 45px rgba(255, 0, 60, 0.28),
+    /* very wide ambient */
+    0 0 80px rgba(255, 0, 60, 0.12);
+
+  animation: neonPulse 2.4s ease-in-out infinite;
+  overflow: hidden; /* clips media + caption inside rounded corners */
+  background: #000;
+}
+
+@keyframes neonPulse {
+  0%, 100% {
+    box-shadow:
+      inset 0 0 18px rgba(255, 0, 60, 0.12),
+      0 0 8px  rgba(255, 0, 60, 0.85),
+      0 0 20px rgba(255, 0, 60, 0.55),
+      0 0 45px rgba(255, 0, 60, 0.28),
+      0 0 80px rgba(255, 0, 60, 0.12);
+    border-color: rgba(255, 0, 60, 0.9);
+  }
+  50% {
+    box-shadow:
+      inset 0 0 28px rgba(255, 0, 60, 0.2),
+      0 0 12px rgba(255, 0, 60, 1),
+      0 0 30px rgba(255, 0, 60, 0.75),
+      0 0 65px rgba(255, 0, 60, 0.4),
+      0 0 110px rgba(255, 0, 60, 0.18);
+    border-color: rgba(255, 0, 60, 1);
+  }
+}
+
+/* Photo — fills full width, portrait crop, NO gap below */
+#photo-display {
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  object-fit: cover;
+  object-position: center top;
+  display: none;
+  filter: saturate(0.75) contrast(1.08);
+  animation: mediaReveal 0.9s ease forwards;
+  /* no border-radius here — parent clips it */
+  border-radius: 0;
+  /* caption sits below so no bottom margin */
+  flex-shrink: 0;
+}
+
+#photo-display.active {
+  display: block;
+}
+
+/* Video — fills full width, portrait crop */
+#video-display {
+  width: 100%;
+  aspect-ratio: 9 / 16;
+  object-fit: cover;
+  display: none;
+  filter: saturate(0.75) contrast(1.08);
+  animation: mediaReveal 0.9s ease forwards;
+  border-radius: 0;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+#video-display.active {
+  display: block;
+}
+
+@keyframes mediaReveal {
+  0%   {
+    opacity: 0;
+    filter: saturate(0) contrast(2.5) brightness(4);
+    clip-path: inset(50% 0 50% 0 round 18px);
+  }
+  40%  {
+    opacity: 0.6;
+    clip-path: inset(8% 0 8% 0 round 18px);
+    filter: saturate(0.2) contrast(1.6);
+  }
+  100% {
+    opacity: 1;
+    clip-path: inset(0% 0 0% 0 round 18px);
+    filter: saturate(0.75) contrast(1.08);
+  }
+}
+
+/* Caption — inside the frame, below the media */
+#media-caption {
+  font-family: var(--font);
+  font-size: 0.6rem;
+  letter-spacing: 0.18em;
+  color: rgba(255, 0, 60, 0.75);
+  text-transform: lowercase;
+  padding: 8px 14px 10px;
+  background: rgba(0, 0, 0, 0.82);
+  border-top: 1px solid rgba(255, 0, 60, 0.25);
+  text-align: left;
+  line-height: 1.6;
+  opacity: 0;
+  /* transition delayed so it appears after media reveal */
+  transition: opacity 0.5s ease 0.85s;
+  /* stays inside rounded bottom corners via parent overflow:hidden */
+  flex-shrink: 0;
+}
+
+#media-caption.visible {
+  opacity: 1;
+}
+
+/* Fullscreen button — overlaid on video, top-right */
+#video-fullscreen-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 10;
+  background: rgba(0, 0, 0, 0.72);
+  border: 1px solid rgba(255, 0, 60, 0.5);
+  border-radius: 6px;
+  color: var(--red);
+  font-family: var(--font);
+  font-size: 0.55rem;
+  letter-spacing: 0.14em;
+  padding: 5px 10px;
+  cursor: pointer;
+  display: none;
+  text-transform: uppercase;
+  transition: background 0.2s, box-shadow 0.2s, border-color 0.2s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+#video-fullscreen-btn:active {
+  background: rgba(255, 0, 60, 0.22);
+  box-shadow: 0 0 12px var(--red-glow);
+  border-color: var(--red);
+}
+
+#media-container.video-active #video-fullscreen-btn {
+  display: block;
+}
+
+/* ─── TEXT CONTAINER ─── */
+#text-container {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 6;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 32px;
+  text-align: center;
+  pointer-events: none;
+  gap: 16px;
+}
+
+#text-container.has-media {
+  justify-content: center;
+  padding-bottom: 0;
+  /* push label above the media frame — flex will space them */
+  gap: 0;
+}
+
+#system-label {
+  font-family: var(--font);
+  font-size: 0.6rem;
+  letter-spacing: 0.35em;
+  color: var(--red-dim);
+  text-transform: uppercase;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  margin-bottom: 4px;
+}
+
+#system-label.visible {
+  opacity: 1;
+}
+
+#main-text {
+  font-family: var(--font);
+  font-size: clamp(1.25rem, 5.5vw, 1.85rem);
+  font-weight: 300;
+  line-height: 1.75;
+  color: var(--white);
+  text-shadow:
+    0 0 12px var(--red-glow),
+    0 0 30px rgba(255,0,60,0.3);
+  letter-spacing: 0.05em;
+  min-height: 2em;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+#main-text.visible {
+  opacity: 1;
+}
+
+#main-text.name-reveal {
+  font-size: clamp(2.5rem, 14vw, 5rem);
+  font-weight: 700;
+  letter-spacing: 0.25em;
+  color: var(--red);
+  text-shadow:
+    0 0 20px var(--red),
+    0 0 50px var(--red-glow),
+    0 0 100px rgba(255,0,60,0.4);
+  animation: nameFlicker 0.1s steps(1) 3;
+}
+
+@keyframes nameFlicker {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.3; }
+}
+
+#sub-text {
+  font-family: var(--font);
+  font-size: clamp(0.9rem, 3.5vw, 1.15rem);
+  font-weight: 100;
+  color: rgba(255,255,255,0.55);
+  letter-spacing: 0.08em;
+  line-height: 1.9;
+  opacity: 0;
+  transition: opacity 0.4s ease 0.4s;
+}
+
+#sub-text.visible {
+  opacity: 1;
+}
+
+/* Special scene styles */
+.terminal-block {
+  font-family: var(--font);
+  border-left: 2px solid var(--red);
+  padding-left: 16px;
+  text-align: left;
+}
+
+.terminal-output {
+  color: var(--red) !important;
+  text-shadow:
+    0 0 8px var(--red),
+    0 0 20px var(--red-glow) !important;
+}
+
+/* ─── TAP INDICATOR ─── */
+#tap-indicator {
+  position: fixed;
+  bottom: 28px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  font-family: var(--font);
+  font-size: 0.65rem;
+  letter-spacing: 0.3em;
+  color: var(--red-dim);
+  text-transform: uppercase;
+  pointer-events: none;
+  animation: tapFlicker 3s ease-in-out infinite;
+}
+
+@keyframes tapFlicker {
+  0%   { opacity: 0; }
+  10%  { opacity: 0.7; }
+  15%  { opacity: 0.1; }
+  20%  { opacity: 0.8; }
+  30%  { opacity: 0.6; }
+  50%  { opacity: 0; }
+  100% { opacity: 0; }
+}
+
+/* ─── PROGRESS DOTS ─── */
+#progress-dots {
+  position: fixed;
+  bottom: 16px;
+  right: 20px;
+  z-index: 10;
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  pointer-events: none;
+}
+
+.dot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--red-dim);
+  opacity: 0.3;
+  transition: all 0.3s ease;
+}
+
+.dot.active {
+  background: var(--red);
+  opacity: 1;
+  box-shadow: 0 0 6px var(--red);
+}
+
+/* ─── FADE TO BLACK ─── */
+#fade-overlay {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 20;
+  background: #000;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 2.5s ease;
+}
+
+#fade-overlay.fade-in {
+  opacity: 1;
+}
+
+/* ─── FINAL MESSAGE ─── */
+#final-message {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 21;
+  font-family: var(--font);
+  font-size: clamp(0.8rem, 3.5vw, 1.1rem);
+  color: var(--red);
+  text-align: center;
+  letter-spacing: 0.15em;
+  line-height: 2;
+  text-shadow: 0 0 20px var(--red-glow);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 1.5s ease 1s;
+  width: 80%;
+}
+
+#final-message.visible {
+  opacity: 1;
+}
+
+/* ─── LOADING SCREEN ─── */
+#boot-screen {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 30;
+  background: #000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  padding: 40px;
+}
+
+#boot-logo {
+  font-family: var(--font);
+  font-size: clamp(1.4rem, 8vw, 2.2rem);
+  font-weight: 700;
+  letter-spacing: 0.4em;
+  color: var(--red);
+  text-shadow: 0 0 20px var(--red-glow), 0 0 50px rgba(255,0,60,0.3);
+  margin-bottom: 8px;
+  animation: logoFlicker 0.08s steps(1) 4 0.2s both;
+}
+
+@keyframes logoFlicker {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.1; }
+}
+
+#boot-log {
+  font-family: var(--font);
+  font-size: 0.62rem;
+  letter-spacing: 0.12em;
+  color: rgba(153,0,32,0.7);
+  text-transform: uppercase;
+  min-height: 1.2em;
+  text-align: center;
+  transition: color 0.2s;
+}
+
+#boot-log.highlight {
+  color: var(--red);
+  text-shadow: 0 0 8px var(--red-glow);
+}
+
+#boot-bar-wrap {
+  width: min(260px, 70vw);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+#boot-bar {
+  width: 100%;
+  height: 2px;
+  background: rgba(255,0,60,0.12);
+  overflow: hidden;
+  position: relative;
+}
+
+#boot-bar::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    90deg,
+    transparent,
+    transparent 8px,
+    rgba(0,0,0,0.4) 8px,
+    rgba(0,0,0,0.4) 10px
+  );
+  z-index: 1;
+}
+
+#boot-fill {
+  height: 100%;
+  width: 0%;
+  background: var(--red);
+  box-shadow: 0 0 12px var(--red-glow), 0 0 4px #fff;
+  transition: width 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  z-index: 0;
+}
+
+#boot-percent {
+  font-family: var(--font);
+  font-size: 0.58rem;
+  letter-spacing: 0.2em;
+  color: var(--red-dim);
+  text-align: right;
+}
+
+#boot-tasks {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: min(260px, 70vw);
+  margin-top: 4px;
+}
+
+.boot-task {
+  font-family: var(--font);
+  font-size: 0.55rem;
+  letter-spacing: 0.1em;
+  color: rgba(100,0,20,0.5);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: color 0.3s;
+}
+
+.boot-task .task-icon {
+  color: rgba(100,0,20,0.3);
+  flex-shrink: 0;
+  transition: color 0.3s, text-shadow 0.3s;
+}
+
+.boot-task.done .task-icon {
+  color: var(--red);
+  text-shadow: 0 0 6px var(--red-glow);
+}
+
+.boot-task.done { color: rgba(180,0,40,0.8); }
+
+.boot-task.active {
+  color: rgba(220,50,60,0.9);
+  animation: taskBlink 0.4s steps(1) infinite;
+}
+
+@keyframes taskBlink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.4; }
+}
+
+#boot-screen.hidden {
+  animation: bootExit 0.6s ease forwards;
+  pointer-events: none;
+}
+
+@keyframes bootExit {
+  0%   { opacity: 1; transform: scale(1); }
+  60%  { opacity: 0.5; transform: scale(1.02); }
+  100% { opacity: 0; transform: scale(1.05); }
+}
+
+/* ─── VIGNETTE ─── */
+body::after {
+  content: '';
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 4;
+  pointer-events: none;
+  background: radial-gradient(
+    ellipse at center,
+    transparent 40%,
+    rgba(0,0,0,0.7) 100%
+  );
+}
+
+/* ─── LOCK SCREEN ─── */
+#lock-screen {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  z-index: 100;
+  background: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow-y: auto;
+  /* Override body touch-action agar tap tombol bisa diterima di mobile */
+  touch-action: auto;
+}
+
+#lock-matrix-hint {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  font-family: var(--font);
+  font-size: 0.75rem;
+  color: rgba(255, 0, 60, 0.07);
+  white-space: pre;
+  letter-spacing: 0.5em;
+  line-height: 2.5;
+  padding: 20px;
+  pointer-events: none;
+  overflow: hidden;
+  word-break: break-all;
+}
+
+#lock-inner {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  padding: 36px 28px;
+  width: min(360px, 92vw);
+  /* Pastikan muat di layar kecil tanpa tombol terpotong */
+  max-height: 98vh;
+  overflow-y: auto;
+
+  background: rgba(0,0,0,0.85);
+  border: 1px solid rgba(255, 0, 60, 0.35);
+  border-radius: 14px;
+  box-shadow:
+    inset 0 0 30px rgba(255, 0, 60, 0.06),
+    0 0 24px rgba(255, 0, 60, 0.25),
+    0 0 60px rgba(255, 0, 60, 0.1);
+  animation: lockPulse 3s ease-in-out infinite;
+  /* touch-action explicit agar tombol bisa diklik di semua browser mobile */
+  touch-action: auto;
+}
+
+@keyframes lockPulse {
+  0%, 100% {
+    box-shadow:
+      inset 0 0 30px rgba(255, 0, 60, 0.06),
+      0 0 24px rgba(255, 0, 60, 0.25),
+      0 0 60px rgba(255, 0, 60, 0.1);
+    border-color: rgba(255, 0, 60, 0.35);
+  }
+  50% {
+    box-shadow:
+      inset 0 0 40px rgba(255, 0, 60, 0.1),
+      0 0 36px rgba(255, 0, 60, 0.45),
+      0 0 90px rgba(255, 0, 60, 0.18);
+    border-color: rgba(255, 0, 60, 0.65);
+  }
+}
+
+#lock-logo {
+  font-family: var(--font);
+  font-size: clamp(1.6rem, 7vw, 2.2rem);
+  font-weight: 700;
+  letter-spacing: 0.3em;
+  color: var(--red);
+  text-shadow: 0 0 18px var(--red-glow), 0 0 45px rgba(255,0,60,0.3);
+  animation: logoFlicker 0.08s steps(1) 4 0.4s both;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+#lock-logo-glitch {
+  animation: lockLogoGlitch 5s ease-in-out infinite;
+}
+
+@keyframes lockLogoGlitch {
+  0%, 90%, 100% { transform: none; filter: none; }
+  91% { transform: translateX(-2px); filter: hue-rotate(60deg); }
+  92% { transform: translateX(2px); filter: hue-rotate(-40deg); }
+  93% { transform: none; filter: none; }
+}
+
+#lock-logo-sub {
+  color: rgba(255,0,60,0.55);
+  font-size: 0.55em;
+  letter-spacing: 0.4em;
+  align-self: flex-end;
+  margin-bottom: 4px;
+}
+
+#lock-subtitle {
+  font-family: var(--font);
+  font-size: 0.55rem;
+  letter-spacing: 0.35em;
+  color: rgba(153, 0, 32, 0.7);
+  text-transform: uppercase;
+  animation: subtitleBlink 4s ease-in-out infinite;
+}
+
+@keyframes subtitleBlink {
+  0%, 80%, 100% { opacity: 1; }
+  85% { opacity: 0.2; }
+  90% { opacity: 1; }
+  95% { opacity: 0.4; }
+}
+
+/* ─── LOCK DISPLAY ─── */
+#lock-display {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 14px 18px;
+  background: rgba(0,0,0,0.6);
+  border: 1px solid rgba(255, 0, 60, 0.2);
+  border-radius: 8px;
+}
+
+#lock-display.lock-shake {
+  animation: lockShake 0.45s ease;
+}
+
+@keyframes lockShake {
+  0%   { transform: translateX(0); }
+  15%  { transform: translateX(-8px); }
+  30%  { transform: translateX(8px); }
+  45%  { transform: translateX(-6px); }
+  60%  { transform: translateX(6px); }
+  75%  { transform: translateX(-3px); }
+  100% { transform: translateX(0); }
+}
+
+#lock-digits {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  justify-content: center;
+}
+
+.ldigit {
+  width: 26px;
+  height: 32px;
+  border-bottom: 2px solid rgba(255, 0, 60, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font);
+  font-size: 1.1rem;
+  color: var(--red);
+  text-shadow: 0 0 10px var(--red-glow);
+  transition: border-color 0.2s, color 0.2s;
+  position: relative;
+}
+
+.ldigit.filled {
+  border-color: rgba(255, 0, 60, 0.8);
+}
+
+.ldigit.filled::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0; right: 0;
+  height: 2px;
+  background: var(--red);
+  box-shadow: 0 0 8px var(--red-glow);
+  animation: digitFill 0.15s ease;
+}
+
+@keyframes digitFill {
+  0% { transform: scaleX(0); }
+  100% { transform: scaleX(1); }
+}
+
+.ldigit.error {
+  color: #ff4444;
+  border-color: #ff4444;
+  text-shadow: 0 0 10px rgba(255,68,68,0.8);
+}
+
+.ldigit.success {
+  color: #00ff88;
+  border-color: #00ff88;
+  text-shadow: 0 0 10px rgba(0,255,136,0.8);
+}
+
+#lock-status {
+  font-family: var(--font);
+  font-size: 0.5rem;
+  letter-spacing: 0.18em;
+  color: rgba(153, 0, 32, 0.6);
+  text-transform: lowercase;
+  transition: color 0.3s;
+}
+
+.lock-status-error {
+  color: #ff4444 !important;
+  text-shadow: 0 0 8px rgba(255,68,68,0.5);
+}
+
+.lock-status-success {
+  color: #00ff88 !important;
+  text-shadow: 0 0 10px rgba(0,255,136,0.6);
+}
+
+/* ─── LOCK KEYPAD ─── */
+#lock-keypad {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  width: 100%;
+}
+
+.lkey {
+  background: rgba(0, 0, 0, 0.7);
+  border: 1px solid rgba(255, 0, 60, 0.25);
+  border-radius: 8px;
+  color: rgba(255, 0, 60, 0.8);
+  font-family: var(--font);
+  font-size: 1.1rem;
+  font-weight: 400;
+  letter-spacing: 0.05em;
+  padding: 14px 0;
+  /* Minimum tap area 44px untuk iOS/Android guidelines */
+  min-height: 44px;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, box-shadow 0.15s, transform 0.08s;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  -webkit-user-select: none;
+  /* Kunci utama: override touch-action agar tap tidak diblok */
+  touch-action: manipulation;
+  /* Pastikan tombol tidak tertimpa elemen lain */
+  position: relative;
+  z-index: 1;
+}
+
+.lkey:active,
+.lkey:focus {
+  outline: none;
+  background: rgba(255, 0, 60, 0.15);
+  border-color: rgba(255, 0, 60, 0.7);
+  box-shadow: 0 0 14px rgba(255, 0, 60, 0.35), inset 0 0 8px rgba(255,0,60,0.1);
+  transform: scale(0.95);
+}
+
+.lkey-clear {
+  font-size: 0.6rem;
+  letter-spacing: 0.2em;
+  color: rgba(153, 0, 32, 0.5);
+  border-color: rgba(153, 0, 32, 0.2);
+}
+
+.lkey-del {
+  font-size: 1rem;
+  color: rgba(255, 80, 80, 0.7);
+  border-color: rgba(255, 80, 80, 0.2);
+}
+
+/* ─── LOCK FOOTER ─── */
+#lock-footer {
+  font-family: var(--font);
+  font-size: 0.48rem;
+  letter-spacing: 0.2em;
+  color: rgba(100, 0, 20, 0.5);
+  text-align: center;
+  animation: footerPulse 2s ease-in-out infinite;
+}
+
+@keyframes footerPulse {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+
+/* ─── LOCK EXIT ANIMATION ─── */
+#lock-screen.lock-exit {
+  animation: lockScreenExit 0.8s ease forwards;
+  pointer-events: none;
+}
+
+@keyframes lockScreenExit {
+  0%   { opacity: 1; transform: scale(1); filter: brightness(1); }
+  30%  { opacity: 1; filter: brightness(3) saturate(2); }
+  60%  { opacity: 0.5; transform: scale(1.04); }
+  100% { opacity: 0; transform: scale(1.08); filter: brightness(0); }
+}
+
+/* ═══════════════════════════════════════
+   ACCESS DENIED OVERLAY
+   ═══════════════════════════════════════ */
+#denied-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Enter: slam in */
+#denied-overlay.denied-enter {
+  pointer-events: auto;
+  animation: deniedEnter 0.12s steps(1) forwards;
+}
+
+@keyframes deniedEnter {
+  0%   { opacity: 0; transform: scaleY(0.05) scaleX(1.08); filter: brightness(8); }
+  40%  { opacity: 1; transform: scaleY(1.04) scaleX(0.98); filter: brightness(2); }
+  70%  { transform: scaleY(0.97) scaleX(1.01); }
+  100% { opacity: 1; transform: scale(1); filter: brightness(1); }
+}
+
+/* Exit: dissolve glitch */
+#denied-overlay.denied-exit {
+  animation: deniedExit 0.6s steps(3) forwards;
+}
+
+@keyframes deniedExit {
+  0%   { opacity: 1; transform: scale(1); filter: none; }
+  25%  { transform: skewX(8deg) translateX(-6px); filter: hue-rotate(90deg) brightness(2); }
+  50%  { transform: skewX(-6deg) translateX(4px); filter: hue-rotate(-60deg); opacity: 0.6; }
+  75%  { transform: scaleY(0.08) scaleX(1.1); opacity: 0.3; filter: brightness(6); }
+  100% { opacity: 0; transform: scale(0); }
+}
+
+/* Scanline overlay inside denied */
+#denied-scanlines {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(255, 0, 60, 0.06) 2px,
+    rgba(255, 0, 60, 0.06) 4px
+  );
+  animation: deniedScan 0.08s steps(1) infinite;
+  z-index: 1;
+}
+
+@keyframes deniedScan {
+  0%   { transform: translateY(0); }
+  50%  { transform: translateY(-4px); }
+  100% { transform: translateY(0); }
+}
+
+/* Static noise canvas */
+#denied-noise {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  opacity: 0.18;
+}
+
+#denied-noise canvas {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  image-rendering: pixelated;
+}
+
+/* Center content */
+#denied-inner {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  /* Gap lebih compact agar muat di layar kecil */
+  gap: clamp(8px, 2.5vw, 14px);
+  /* Padding horizontal cukup, tidak memotong teks */
+  padding: 0 clamp(16px, 5vw, 32px);
+  text-align: center;
+  /* Pastikan tidak overflow vertikal */
+  width: 100%;
+  max-width: 100vw;
+  box-sizing: border-box;
+}
+
+/* Icon */
+#denied-icon {
+  /* Lebih kecil di HP sempit agar tidak makan ruang berlebih */
+  font-size: clamp(1.8rem, 9vw, 4rem);
+  animation: deniedIconPulse 0.3s steps(1) infinite;
+  filter: drop-shadow(0 0 20px rgba(255,0,60,0.9));
+  line-height: 1;
+}
+
+@keyframes deniedIconPulse {
+  0%, 60%, 100% { opacity: 1; }
+  30%            { opacity: 0.3; transform: scale(1.08); }
+  80%            { opacity: 0.7; transform: scale(0.96); }
+}
+
+/* Main text lines */
+#denied-line1,
+#denied-line2 {
+  font-family: var(--font);
+  font-weight: 700;
+  /*
+   * letter-spacing dikurangi drastis — spacing 0.3em di font besar
+   * bikin kata "TIDAK DIKENAL" overflow di HP 360px
+   * 0.08em tetap terasa impactful tapi muat di semua layar
+   */
+  letter-spacing: clamp(0.04em, 1.5vw, 0.15em);
+  color: var(--red);
+  line-height: 1.05;
+  /* Wrap kalau kata terlalu panjang (mis. "TIDAK DIKENAL") */
+  word-break: break-word;
+  overflow-wrap: break-word;
+  width: 100%;
+  text-shadow:
+    0 0 10px var(--red),
+    0 0 30px var(--red-glow),
+    0 0 70px rgba(255,0,60,0.4);
+}
+
+#denied-line1 {
+  /*
+   * Turunkan batas atas clamp — 13vw di HP 360px = ~47px, dengan
+   * letter-spacing lama itu overflow. Sekarang 11vw + letter-spacing kecil = aman.
+   */
+  font-size: clamp(1.8rem, 11vw, 5rem);
+  animation: line1Glitch 0.15s steps(2) infinite;
+}
+
+#denied-line2 {
+  font-size: clamp(1.8rem, 11vw, 5rem);
+  animation: line2Glitch 0.18s steps(2) infinite 0.05s;
+}
+
+@keyframes line1Glitch {
+  0%, 80%, 100% { transform: none; clip-path: none; }
+  20% {
+    transform: translateX(-4px);
+    clip-path: polygon(0 15%, 100% 15%, 100% 40%, 0 40%);
+    text-shadow: 4px 0 0 rgba(0,255,200,0.7), -4px 0 0 rgba(255,0,60,1),
+                 0 0 30px var(--red-glow);
+  }
+  50% {
+    transform: translateX(3px);
+    clip-path: polygon(0 55%, 100% 55%, 100% 85%, 0 85%);
+    text-shadow: -3px 0 0 rgba(0,200,255,0.5), 3px 0 0 var(--red),
+                 0 0 30px var(--red-glow);
+  }
+}
+
+@keyframes line2Glitch {
+  0%, 75%, 100% { transform: none; }
+  30% {
+    transform: translateX(5px) skewX(-2deg);
+    text-shadow: -5px 0 0 rgba(0,255,200,0.6), 5px 0 0 var(--red),
+                 0 0 40px var(--red-glow);
+  }
+  60% {
+    transform: translateX(-3px) skewX(1deg);
+  }
+}
+
+/* Sub label */
+#denied-sub {
+  font-family: var(--font);
+  /* Min 0.6rem agar terbaca di HP, max 0.75rem di desktop */
+  font-size: clamp(0.6rem, 2.8vw, 0.75rem);
+  /* Letter-spacing dikurangi agar tidak overflow di layar sempit */
+  letter-spacing: clamp(0.06em, 1vw, 0.18em);
+  color: rgba(255, 0, 60, 0.55);
+  text-transform: lowercase;
+  /* Wrap teks sub jika panjang */
+  word-break: break-word;
+  overflow-wrap: break-word;
+  width: 100%;
+  padding: 0 8px;
+  animation: subBlink 0.6s steps(1) infinite;
+}
+
+@keyframes subBlink {
+  0%, 45%, 100% { opacity: 1; }
+  50%            { opacity: 0.2; }
+}
+
+/* Threat analysis bar */
+#denied-bar-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  /* Ikuti lebar parent agar tidak overflow */
+  width: 100%;
+  max-width: min(280px, 85vw);
+  margin-top: clamp(2px, 1vw, 6px);
+}
+
+#denied-bar-label {
+  font-family: var(--font);
+  font-size: clamp(0.42rem, 2vw, 0.52rem);
+  letter-spacing: clamp(0.1em, 1.5vw, 0.28em);
+  color: rgba(255, 0, 60, 0.45);
+  text-align: left;
+}
+
+#denied-bar {
+  width: 100%;
+  height: 3px;
+  background: rgba(255, 0, 60, 0.1);
+  border: 1px solid rgba(255, 0, 60, 0.2);
+  overflow: hidden;
+  position: relative;
+}
+
+#denied-bar-fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, #990020, var(--red), #ff6080);
+  box-shadow: 0 0 10px var(--red-glow), 0 0 4px #fff;
+}
+
+/* Error code */
+#denied-code {
+  font-family: var(--font);
+  font-size: clamp(0.42rem, 2vw, 0.55rem);
+  letter-spacing: clamp(0.1em, 1.5vw, 0.22em);
+  color: rgba(153, 0, 32, 0.4);
+  animation: codeFlicker 0.25s steps(1) infinite;
+}
+
+@keyframes codeFlicker {
+  0%, 70%, 100% { opacity: 1; }
+  75%            { opacity: 0; }
+  80%            { opacity: 0.6; }
+}

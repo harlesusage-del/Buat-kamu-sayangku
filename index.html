@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+
+  <title>AZZAHRA // SYSTEM DETECTED</title>
+
+  <!-- PWA CONFIG -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#000000">
+
+  <!-- IOS SUPPORT -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+
+  <!-- FONT -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@100;300;400;700&display=swap" rel="stylesheet">
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- LAYER 1: Matrix Rain -->
+  <canvas id="matrix-canvas"></canvas>
+
+  <!-- LAYER 2: Glitch overlay -->
+  <div id="glitch-overlay"></div>
+
+  <!-- LAYER 3: Scanlines -->
+  <div id="scanlines"></div>
+
+  <!-- LAYER 4: Media container -->
+  <div id="media-container">
+    <div id="media-frame">
+      <img id="photo-display" src="" alt="" />
+      <video id="video-display" src="" playsinline></video>
+      <!-- Fullscreen button for video -->
+      <button id="video-fullscreen-btn" onclick="enterVideoFullscreen(event)">&#x26F6; fullscreen</button>
+      <div id="media-caption"></div>
+    </div>
+  </div>
+
+  <!-- LAYER 5: Text container -->
+  <div id="text-container">
+    <div id="system-label"></div>
+    <div id="main-text"></div>
+    <div id="sub-text"></div>
+  </div>
+
+  <!-- TAP INDICATOR -->
+  <div id="tap-indicator">[ tap ]</div>
+
+  <!-- PROGRESS DOTS -->
+  <div id="progress-dots"></div>
+
+  <!--
+    ═══════════════════════════════════════════
+    SOUND PLACEHOLDERS
+    Ganti src dengan file audio kamu di folder /media/
+    Format yang disupport: .mp3 / .ogg / .wav
+    ═══════════════════════════════════════════
+
+    TAP SOUND       → diputar setiap kali tap / ganti scene
+    BOOT SOUND      → diputar saat loading screen selesai
+    GLITCH SOUND    → diputar saat efek glitch acak muncul
+    REVEAL SOUND    → diputar saat nama AZZAHRA muncul (scene 2)
+    FINAL SOUND     → diputar saat scene terakhir / fade to black
+  -->
+  <audio id="sfx-tap"    src="media/sfx_tap.mp3"    preload="auto"></audio>
+  <audio id="sfx-boot"   src="media/sfx_boot.mp3"   preload="auto"></audio>
+  <audio id="sfx-glitch" src="media/sfx_glitch.mp3" preload="auto"></audio>
+  <audio id="sfx-reveal" src="media/sfx_reveal.mp3" preload="auto"></audio>
+  <audio id="sfx-final"  src="media/sfx_final.mp3"  preload="auto"></audio>
+
+  <script src="script.js"></script>
+</body>
+</html>
