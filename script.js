@@ -126,16 +126,16 @@ function randomChar(includeAzzahra) {
 }
 
 let lastTime = 0;
-const TARGET_FPS = 30;
-const FRAME_INTERVAL = 1000 / TARGET_FPS;
+let matrixTargetFPS = 30;   // bisa diturunkan saat video
 let animFrameId;
 
 function drawMatrix(timestamp) {
   animFrameId = requestAnimationFrame(drawMatrix);
 
+  const frameInterval = 1000 / matrixTargetFPS;
   const elapsed = timestamp - lastTime;
-  if (elapsed < FRAME_INTERVAL) return;
-  lastTime = timestamp - (elapsed % FRAME_INTERVAL);
+  if (elapsed < frameInterval) return;
+  lastTime = timestamp - (elapsed % frameInterval);
 
   if (matrixPaused) return;
 
@@ -145,27 +145,31 @@ function drawMatrix(timestamp) {
 
   ctx.font = `${FONT_SIZE}px "JetBrains Mono", monospace`;
 
+  // Nonaktifkan shadowBlur saat mode hemat (video playing) — ini operasi GPU paling berat
+  const useShadow = !matrixPaused && matrixTargetFPS > 15;
+
   const useAzzahra = sceneIndex >= 9;
 
   for (let i = 0; i < columns.length; i++) {
     const col = columns[i];
     const x = i * FONT_SIZE;
 
-    // Randomize character for this frame
     const ch = randomChar(useAzzahra);
 
     // Head of stream — bright
     ctx.fillStyle = `rgba(255, 0, 60, ${0.9 * matrixIntensity})`;
-    ctx.shadowColor = '#ff003c';
-    ctx.shadowBlur = 8;
+    if (useShadow) {
+      ctx.shadowColor = '#ff003c';
+      ctx.shadowBlur = 8;
+    }
     ctx.fillText(ch, x, col.y);
+    if (useShadow) ctx.shadowBlur = 0;
 
     // Trail
     for (let j = 1; j < col.length; j++) {
       const alpha = (1 - j / col.length) * 0.55 * matrixIntensity;
       if (alpha <= 0) continue;
       ctx.fillStyle = `rgba(180, 0, 30, ${alpha})`;
-      ctx.shadowBlur = 0;
       const trailY = col.y - j * FONT_SIZE;
       if (trailY > 0 && trailY < canvas.height) {
         ctx.fillText(randomChar(useAzzahra), x, trailY);
@@ -283,6 +287,9 @@ function clearScene(cb) {
   // Reset video lock
   videoSceneLocked = false;
   tapIndicator.textContent = '[ tap ]';
+  // Restore matrix performance ke normal
+  matrixTargetFPS = 30;
+  canvas.style.opacity = '0.85';
 
   // Hide text
   mainText.classList.remove('visible');
@@ -372,11 +379,30 @@ function showMedia({ src, type = 'photo', caption = '' }) {
       tapIndicator.textContent = '[ tap ]';
     }, { once: true });
 
-    videoDisplay.play().catch(() => {
-      // Autoplay diblok browser — unlock agar user bisa lanjut
-      videoSceneLocked = false;
-      tapIndicator.textContent = '[ tap ]';
-    });
+    // Preload hint agar browser buffer dulu sebelum decode
+    videoDisplay.preload = 'auto';
+
+    // Tunggu buffer cukup (canplaythrough) sebelum play
+    // Ini cegah lag di awal pada HP dengan I/O lambat
+    function tryPlay() {
+      videoDisplay.play().catch(() => {
+        videoSceneLocked = false;
+        tapIndicator.textContent = '[ tap ]';
+      });
+    }
+
+    if (videoDisplay.readyState >= 4) {
+      // Sudah fully buffered — langsung play
+      tryPlay();
+    } else {
+      tapIndicator.textContent = '[ buffering... ]';
+      videoDisplay.addEventListener('canplaythrough', () => {
+        tapIndicator.textContent = '[ menonton video... ]';
+        tryPlay();
+      }, { once: true });
+      // Mulai load
+      videoDisplay.load();
+    }
   }
 
   if (caption) {
@@ -436,7 +462,7 @@ const scenes = [
   () => {
     showText({
       label: '// anomaly detected',
-      main: 'Di antara miliaran manusia,\nanehnya aku bisa bertemu denganmu.',
+      main: 'Di antara miliaran manusia,\nanehnya aku bisa ketemu kamu.',
       delay: 100
     });
   },
@@ -463,7 +489,7 @@ const scenes = [
 
   // Scene 6 — Photo 3
   () => {
-    showMedia({ src: 'media/photo3.jpg', caption: '> beberapa orang hanya lewat di hidup kita\n  tapi kamu tidak' });
+    showMedia({ src: 'media/photo3.jpg', caption: '> beberapa orang cuma lewat di hidup kita\n  kamu enggak' });
     setTimeout(() => {
       showText({ label: '// memory_03.jpg', delay: 200 });
     }, 200);
@@ -487,19 +513,22 @@ const scenes = [
       }, 400);
       setTimeout(() => {
         subText.classList.add('visible');
-        glitchDecode(subText, 'Statistiknya kecil.\nTapi keajaiban terkadang memang bisa terjadi.', 700);
+        glitchDecode(subText, 'Statistiknya kecil.\nTapi keajaiban kadang memang terjadi.', 700);
       }, 1200);
     }, 1800);
   },
 
   // Scene 8 — Video
   () => {
-    // Pause matrix briefly
     matrixPaused = true;
     triggerGlitch('flash');
 
     setTimeout(() => {
       matrixPaused = false;
+      // Mode hemat untuk HP kentang: FPS matrix turun + canvas opacity dikurangi
+      matrixTargetFPS = 10;
+      canvas.style.opacity = '0.35';
+
       showMedia({ src: 'media/video.mp4', type: 'video', caption: '> core memory detected' });
       setTimeout(() => {
         showText({ label: '// playing core_memory.mp4', delay: 100 });
@@ -515,7 +544,7 @@ const scenes = [
     setTimeout(() => {
       showText({
         label: '// AZZAHRA // AZZAHRA // AZZAHRA',
-        main: 'Selamat ulang tahun, sayang.',
+        main: 'Selamat ulang tahun.',
         delay: 300
       });
     }, 200);
@@ -990,22 +1019,3 @@ window.addEventListener('DOMContentLoaded', () => {
   scheduleGlitch();
   createLockScreen();
 });
-
-// ─── PWA SERVICE WORKER REGISTER ─────────────────
-
-if ("serviceWorker" in navigator) {
-
-  window.addEventListener("load", () => {
-
-    navigator.serviceWorker
-      .register("./sw.js")
-      .then(reg => {
-        console.log("PWA Service Worker aktif", reg);
-      })
-      .catch(err => {
-        console.log("Service Worker gagal", err);
-      });
-
-  });
-
-}
