@@ -287,9 +287,17 @@ function clearScene(cb) {
   // Reset video lock
   videoSceneLocked = false;
   tapIndicator.textContent = '[ tap ]';
-  // Restore matrix performance ke normal
   matrixTargetFPS = 30;
-  canvas.style.opacity = '0.85';
+  // Hidupkan kembali semua efek jika dimatikan saat video scene
+  if (canvas.style.display === 'none') {
+    canvas.style.display  = '';
+    canvas.style.opacity  = '0.85';
+    document.getElementById('glitch-overlay').style.display = '';
+    document.getElementById('scanlines').style.display      = '';
+    document.body.style.background = '';
+    lastTime = 0;
+    requestAnimationFrame(drawMatrix);
+  }
 
   // Hide text
   mainText.classList.remove('visible');
@@ -518,22 +526,20 @@ const scenes = [
     }, 1800);
   },
 
-  // Scene 8 — Video
+  // Scene 8 — Video (semua efek dimatikan, fokus full ke video)
   () => {
-    matrixPaused = true;
     triggerGlitch('flash');
 
     setTimeout(() => {
-      matrixPaused = false;
-      // Mode hemat untuk HP kentang: FPS matrix turun + canvas opacity dikurangi
-      matrixTargetFPS = 10;
-      canvas.style.opacity = '0.35';
+      // Matikan SEMUA efek berat
+      cancelAnimationFrame(animFrameId);   // stop matrix loop
+      canvas.style.display        = 'none';
+      document.getElementById('glitch-overlay').style.display = 'none';
+      document.getElementById('scanlines').style.display      = 'none';
+      document.body.style.background = '#000';
 
       showMedia({ src: 'media/video.mp4', type: 'video', caption: '> core memory detected' });
-      setTimeout(() => {
-        showText({ label: '// playing core_memory.mp4', delay: 100 });
-      }, 200);
-    }, 800);
+    }, 600);
   },
 
   // Scene 9 — Happy Birthday
